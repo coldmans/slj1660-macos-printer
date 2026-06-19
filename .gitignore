@@ -1,0 +1,14 @@
+/target/
+*.raw
+!fixtures/.gitkeep
+!fixtures/
+!fixtures/confirm/
+!fixtures/confirm/*.http
+!fixtures/captured-confirmed/
+!fixtures/captured-confirmed/*.raw
+*.pbm
+*.pdf
+!tests/fixtures/*.pdf
+__pycache__/
+*.pyc
+.DS_Store

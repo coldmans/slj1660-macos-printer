@@ -1,0 +1,23 @@
+[package]
+name = "slj1660-mac-driver"
+version = "0.1.0"
+edition = "2021"
+description = "User-space print-only printer app for Samsung SL-J1660 on macOS"
+license = "MIT AND BSD-3-Clause"
+
+[[bin]]
+name = "slj1660"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "1.0"
+clap = { version = "4.5", features = ["derive"] }
+rusb = "0.9"
+tempfile = "3.14"
+thiserror = "2.0"
+tiny_http = "0.12"
+
+[dev-dependencies]
+assert_cmd = "2.0"
+predicates = "3.1"
+tempfile = "3.14"

@@ -1,0 +1,15 @@
+PUT /DevMgmt/ConsumableConfigDyn.xml HTTP/1.1
+Content-Length: 725
+Content-Type: text/xml
+HOST: localhost
+
+<?xml version="1.0" encoding="UTF-8"?>
+<ConsumableConfigDyn xmlns="http://www.hp.com/schemas/imaging/con/ledm/consumableconfigdyn/2007/11/19" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.hp.com/schemas/imaging/con/ledm/consumableconfigdyn/2007/11/19 ConsumableConfigDyn.xsd">
+	<ConsumableInfo>
+		<ConsumableLabelCode xmlns="http://www.hp.com/schemas/imaging/con/dictionaries/1.0/">K</ConsumableLabelCode>
+		<ConsumableStateAvailableActions xmlns="http://www.hp.com/schemas/imaging/con/dictionaries/1.0/">
+			<ConsumableState>veryLow</ConsumableState>
+			<SelectedAction>continue</SelectedAction>
+		</ConsumableStateAvailableActions>
+	</ConsumableInfo>
+</ConsumableConfigDyn>

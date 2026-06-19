@@ -1,0 +1,17 @@
+PUT /DevMgmt/ProductStatusDyn.xml HTTP/1.1
+Content-Length: 753
+Content-Type: text/xml
+HOST: localhost
+
+<?xml version="1.0" encoding="UTF-8"?>
+<ProductStatusDyn xmlns="http://www.hp.com/schemas/imaging/con/ledm/productstatusdyn/2007/10/31" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.hp.com/schemas/imaging/con/ledm/productstatusdyn/2007/10/31 ProductStatusDyn.xsd">
+	<AlertTable>
+		<Alert>
+			<ProductStatusAlertID xmlns="http://www.hp.com/schemas/imaging/con/ledm/alertdetails/2007/10/31">trayEmptyOrOpen</ProductStatusAlertID>
+			<AlertDetails xmlns="http://www.hp.com/schemas/imaging/con/ledm/alertdetails/2007/10/31">
+				<AlertDetailsInputBin>Tray1</AlertDetailsInputBin>
+				<AlertDetailsUserAction>pressOK</AlertDetailsUserAction>
+			</AlertDetails>
+		</Alert>
+	</AlertTable>
+</ProductStatusDyn>
