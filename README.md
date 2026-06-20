@@ -21,13 +21,20 @@ print-only 프린터 앱**입니다. 커널 확장, 오래된 Apple HP Printer D
 
 ## 빠른 설치
 
+비개발자/다른 Mac에서는 GitHub Releases에서 최신
+`slj1660-macos-printer-*-macos-arm64.tar.gz`를 받은 뒤 압축을 풀고
+`Install SL-J1660.command`를 더블클릭하는 방식을 권장합니다.
+
+소스에서 바로 설치하려면:
+
 ```sh
 git clone https://github.com/coldmans/slj1660-macos-printer.git
 cd slj1660-macos-printer
 open "Install SL-J1660.command"
 ```
 
-또는 Finder에서 `Install SL-J1660.command`를 더블클릭하세요.
+또는 Finder에서 `Install SL-J1660.command`를 더블클릭하세요. Release 번들은
+미리 빌드된 `bin/slj1660`을 포함하므로 Rust/Cargo가 없어도 설치할 수 있습니다.
 
 설치기는 다음 작업을 한 번에 처리합니다.
 
@@ -181,6 +188,12 @@ UI, no color-management pipeline, and no kernel extension. The practical goal is
 simple: make the SL-J1660 usable for document printing on modern macOS.
 
 Quick install:
+
+For non-developer installs, download the latest
+`slj1660-macos-printer-*-macos-arm64.tar.gz` from GitHub Releases, extract it,
+and double-click `Install SL-J1660.command`.
+
+From source:
 
 ```sh
 git clone https://github.com/coldmans/slj1660-macos-printer.git

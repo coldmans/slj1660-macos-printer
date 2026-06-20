@@ -2,7 +2,17 @@
 
 ## One-Click-ish Install
 
-For another Mac, start here:
+For another Mac, the easiest path is the release bundle:
+
+1. Download the latest `slj1660-macos-printer-*-macos-arm64.tar.gz` from GitHub
+   Releases.
+2. Extract it.
+3. Double-click `Install SL-J1660.command`.
+
+The release bundle includes a prebuilt `bin/slj1660`, so it does not require
+Rust/Cargo on the target Mac.
+
+For a source checkout, use:
 
 ```sh
 git clone https://github.com/coldmans/slj1660-macos-printer.git
