@@ -1,4 +1,5 @@
 /target/
+/dist/
 *.raw
 !fixtures/.gitkeep
 !fixtures/

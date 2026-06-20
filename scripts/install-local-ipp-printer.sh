@@ -14,7 +14,8 @@ chunk_delay_ms="${SLJ1660_CHUNK_DELAY_MS:-0}"
 launch_agents="$HOME/Library/LaunchAgents"
 logs="$HOME/Library/Logs"
 plist="$launch_agents/$label.plist"
-binary="$PWD/target/release/slj1660"
+binary="${SLJ1660_BINARY:-$PWD/target/release/slj1660}"
+skip_build="${SLJ1660_SKIP_BUILD:-0}"
 dry_run="${SLJ1660_IPP_DRY_RUN:-0}"
 python_path="${SLJ1660_PYTHON:-}"
 
@@ -34,6 +35,8 @@ Environment overrides:
   SLJ1660_IPP_DRY_RUN=1   daemon renders jobs but does not send USB data
   SLJ1660_RUNTIME_PATH    default: Homebrew + system binary paths
   SLJ1660_PYTHON          Python executable with Pillow installed
+  SLJ1660_BINARY          default: target/release/slj1660
+  SLJ1660_SKIP_BUILD=1    use SLJ1660_BINARY without running cargo build
   SLJ1660_PRINT_CHUNK_SIZE default: 16384
   SLJ1660_TIMEOUT_MS       default: 30000
   SLJ1660_CHUNK_DELAY_MS   default: 0
@@ -84,7 +87,19 @@ if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
   exit 0
 fi
 
-cargo build --release
+if [ "$skip_build" = "1" ]; then
+  if [ ! -x "$binary" ]; then
+    echo "SLJ1660_BINARY is not executable: $binary" >&2
+    exit 1
+  fi
+else
+  cargo build --release
+  if [ ! -x "$binary" ]; then
+    echo "release binary was not produced: $binary" >&2
+    exit 1
+  fi
+fi
+
 mkdir -p "$launch_agents" "$logs"
 
 if [ -z "$python_path" ]; then

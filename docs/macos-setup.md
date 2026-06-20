@@ -1,14 +1,52 @@
 # macOS Setup
 
+## One-Click-ish Install
+
+For another Mac, start here:
+
+```sh
+git clone https://github.com/coldmans/slj1660-macos-printer.git
+cd slj1660-macos-printer
+open "Install SL-J1660.command"
+```
+
+You can also double-click `Install SL-J1660.command` in Finder.
+
+The installer copies the project into:
+
+```text
+~/Library/Application Support/slj1660-macos-printer
+```
+
+Then it installs/checks Homebrew runtime tools, creates a private Python venv
+with Pillow, builds or uses the `slj1660` binary, registers the LaunchAgent,
+and adds the CUPS queue:
+
+```text
+SL_J1660_Local -> ipp://127.0.0.1:8631/printers/slj1660
+```
+
+If something fails, run:
+
+```sh
+scripts/doctor-macos-printer.sh
+```
+
+Remove the LaunchAgent and queue with:
+
+```sh
+open "Uninstall SL-J1660.command"
+```
+
 ## Requirements
 
 - modern macOS on Apple Silicon
-- Rust and Cargo
 - Homebrew
 - libusb
-- Ghostscript for the placeholder PDF rasterization path
-- Poppler for the experimental Mode10 PDF and local IPP printer-app path
+- Poppler for PDF rendering in the local IPP printer-app path
+- Ghostscript for the older placeholder PDF rasterization path
 - Python 3 with Pillow
+- Rust and Cargo only when installing from source instead of a release bundle
 
 Install runtime tools:
 
@@ -62,7 +100,14 @@ SLJ1660_GS=/path/to/gs cargo run -- print-pdf sample.pdf --dry-run
 
 ## Local IPP Printer App
 
-The driver-like path is a local user-space IPP server. Start it manually:
+The driver-like path is a local user-space IPP server. The recommended installer
+is:
+
+```sh
+open "Install SL-J1660.command"
+```
+
+For development, start it manually:
 
 ```sh
 cd <workspace>/slj1660-mac-driver
@@ -88,7 +133,7 @@ To register it as a macOS queue:
 scripts/install-local-ipp-printer.sh
 ```
 
-This installs a LaunchAgent for:
+This lower-level script installs a LaunchAgent for:
 
 ```text
 slj1660 serve-ipp --bind 127.0.0.1:8631
@@ -118,6 +163,10 @@ Remove both pieces with:
 ```sh
 scripts/install-local-ipp-printer.sh --remove
 ```
+
+The higher-level `Install SL-J1660.command` wraps this script and also handles
+dependency setup, private Python venv creation, copying the project to
+Application Support, and opening macOS printer settings after install.
 
 Logs are written to:
 
@@ -174,7 +223,21 @@ only when that is intended.
 Re-run `scripts/install-local-ipp-printer.sh` after changing dependencies or
 moving Homebrew.
 
-This is still an MVP. The local IPP endpoint accepts PDF jobs and routes them
-through the experimental Mode10 path. If macOS sends a non-PDF document format,
-the server rejects that job instead of pretending it can print it. The server
-supports direct `Print-Job` and split `Create-Job` / `Send-Document` local flows.
+This is a working beta for the tested black-and-white SL-J1660 path. The local
+IPP endpoint accepts PDF jobs and routes them through the Mode10 path. If macOS
+sends a non-PDF document format, the server rejects that job instead of
+pretending it can print it. The server supports direct `Print-Job` and split
+`Create-Job` / `Send-Document` local flows.
+
+## Release Bundle
+
+Build a double-click install bundle for GitHub Releases:
+
+```sh
+scripts/build-macos-bundle.sh
+```
+
+The archive is written under `dist/`. It includes a prebuilt `bin/slj1660`, the
+installer commands, scripts, license notices, and the LEDM confirmation fixtures.
+On another Apple Silicon Mac, extract it and double-click
+`Install SL-J1660.command`.
