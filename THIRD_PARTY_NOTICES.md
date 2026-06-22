@@ -2,14 +2,19 @@
 
 ## HP HPLIP Mode10.cpp
 
-`scripts/print-text-mode10.py` contains a small Python port of the Mode10 row
-compression algorithm from HP HPLIP's `prnt/hpcups/Mode10.cpp`.
+This repository contains small derived implementations around the Mode10 row
+compression format from HP HPLIP's `prnt/hpcups/Mode10.cpp`:
+
+- `scripts/print-text-mode10.py` ports the row compressor to Python.
+- `scripts/print-pdf-mode10.py` reuses that Python compressor for rendered PDF
+  pages.
+- `src/mode10.rs` implements a Rust decoder/analyzer for the same row format.
 
 Source reference used during development:
 <https://github.com/Distrotech/hplip/blob/master/prnt/hpcups/Mode10.cpp>
 
-The source file carries a BSD-style HP notice. The relevant notice preserved in
-this repository is:
+The upstream source file carries a BSD-style HP notice. The relevant notice
+preserved in this repository is:
 
 ```text
 Copyright (c) 1996 - 2001, Hewlett-Packard Co. All rights reserved.

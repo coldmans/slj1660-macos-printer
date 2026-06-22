@@ -17,6 +17,7 @@ plist="$launch_agents/$label.plist"
 binary="${SLJ1660_BINARY:-$PWD/target/release/slj1660}"
 skip_build="${SLJ1660_SKIP_BUILD:-0}"
 dry_run="${SLJ1660_IPP_DRY_RUN:-0}"
+auto_resume="${SLJ1660_AUTO_RESUME:-0}"
 python_path="${SLJ1660_PYTHON:-}"
 
 usage() {
@@ -33,6 +34,7 @@ Environment overrides:
   SLJ1660_IPP_PORT        default: 8631
   SLJ1660_SERIAL          optional USB serial for multi-printer setups
   SLJ1660_IPP_DRY_RUN=1   daemon renders jobs but does not send USB data
+  SLJ1660_AUTO_RESUME=1   send LEDM feed-attention resume during long transfers
   SLJ1660_RUNTIME_PATH    default: Homebrew + system binary paths
   SLJ1660_PYTHON          Python executable with Pillow installed
   SLJ1660_BINARY          default: target/release/slj1660
@@ -143,6 +145,11 @@ fi
 if [ "$dry_run" = "1" ]; then
   program_args="$program_args
     <string>--dry-run</string>"
+fi
+
+if [ "$auto_resume" = "1" ]; then
+  program_args="$program_args
+    <string>--auto-resume</string>"
 fi
 
 cat > "$plist" <<EOF

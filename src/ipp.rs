@@ -67,6 +67,7 @@ pub struct IppServerConfig {
     pub serial_number: Option<String>,
     pub dry_run: bool,
     pub confirm_alerts: bool,
+    pub auto_resume: bool,
     pub chunk_size: usize,
     pub chunk_delay: Duration,
     pub timeout: Duration,
@@ -751,7 +752,7 @@ fn child_process_path() -> String {
 fn send_raw_to_printer(config: &IppServerConfig, raw_path: &Path) -> Result<()> {
     let bytes =
         fs::read(raw_path).with_context(|| format!("failed to read {}", raw_path.display()))?;
-    let transfer_done = if config.confirm_alerts {
+    let transfer_done = if config.auto_resume {
         Some(spawn_auto_resume_watchdog(
             config.clone(),
             raw_path.to_path_buf(),
@@ -1210,6 +1211,7 @@ mod tests {
             serial_number: Some("TEST".to_string()),
             dry_run: true,
             confirm_alerts: false,
+            auto_resume: false,
             chunk_size: 1024,
             chunk_delay: Duration::ZERO,
             timeout: Duration::from_secs(1),

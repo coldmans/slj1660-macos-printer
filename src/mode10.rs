@@ -1,3 +1,19 @@
+// Portions of this Mode10 decoder mirror the HP HPLIP Mode10 row-compression
+// format implemented by prnt/hpcups/Mode10.cpp.
+//
+// Original Mode10.cpp notice:
+// Copyright (c) 1996 - 2001, Hewlett-Packard Co.
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that source redistributions retain the
+// copyright notice, conditions, and disclaimer; binary redistributions
+// reproduce them in documentation or other materials; and neither the
+// Hewlett-Packard name nor contributor names are used for endorsement without
+// prior written permission. The original software is provided "as is", without
+// express or implied warranties, and the author disclaims liability for damages
+// arising from use.
+
 use anyhow::{anyhow, bail, Context, Result};
 
 const WHITE_PIXEL: u32 = 0x00ff_fffe;
@@ -65,7 +81,6 @@ fn decode_row_payload(payload: &[u8], seed: &[u32], width_pixels: usize) -> Resu
 
         let pixel_source = command & 0x60;
         if command & E_RLE == E_RLE {
-            let replacement_count = rle_replacement_count(command, &mut reader)?;
             let pixel = source_or_new_pixel(
                 pixel_source,
                 &row,
@@ -77,6 +92,7 @@ fn decode_row_payload(payload: &[u8], seed: &[u32], width_pixels: usize) -> Resu
             if pixel_source == EE_NEW {
                 cached_color = pixel;
             }
+            let replacement_count = rle_replacement_count(command, &mut reader)?;
             let end = checked_row_end(pixel_index, replacement_count, width_pixels)?;
             row[pixel_index..end].fill(pixel);
             pixel_index = end;
@@ -305,9 +321,7 @@ impl<'a> PayloadReader<'a> {
 
             if self.payload.get(self.offset) == Some(&0) {
                 self.offset += 1;
-                if self.is_empty() {
-                    return Some(total);
-                }
+                return Some(total);
             }
         }
     }
@@ -341,5 +355,25 @@ mod tests {
         let mut state = Mode10State::new(1).unwrap();
         let row = state.decode_row(&[0x00, 0x7f, 0xff, 0xff]).unwrap();
         assert!(row.blank);
+    }
+
+    #[test]
+    fn decodes_extended_rle_after_new_pixel() {
+        let mut state = Mode10State::new(10).unwrap();
+        let row = state.decode_row(&[0x87, 0x7f, 0x7f, 0x7f, 0x01]).unwrap();
+
+        assert_eq!(row.pixels, vec![0x00fe_fefe; 10]);
+    }
+
+    #[test]
+    fn decodes_vli_sentinel_without_consuming_next_command() {
+        let mut state = Mode10State::new(265).unwrap();
+        let mut payload = vec![0x87, 0x7f, 0x7f, 0x7f, 0xff, 0x00];
+        payload.extend_from_slice(&[0x00, 0x00, 0x00, 0x00]);
+
+        let row = state.decode_row(&payload).unwrap();
+
+        assert_eq!(&row.pixels[..264], vec![0x00fe_fefe; 264]);
+        assert_eq!(row.pixels[264], 0);
     }
 }

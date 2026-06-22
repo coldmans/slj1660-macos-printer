@@ -26,11 +26,12 @@ working hypothesis only. The project must verify it through captured streams.
 
 ## Licensing Boundary
 
-This repository started as a clean-room scaffold. For local personal use, the
-experimental text path now includes a Python port of HP HPLIP's
-`prnt/hpcups/Mode10.cpp` compressor. That HPLIP file carries a BSD-style HP
-license header, so keep the attribution and license notice if copying or
-redistributing the script. Do not describe the Mode10 encoder as clean-room.
+This repository started as a clean-room scaffold. The current Mode10 compressor
+and decoder work now includes small code derived from HP HPLIP's
+`prnt/hpcups/Mode10.cpp`. That HPLIP file carries a BSD-style HP license
+header, so keep the attribution and license notice if copying or redistributing
+the Mode10 scripts or decoder. Do not describe the Mode10 encoder/decoder as
+clean-room.
 
 ## Unknowns
 

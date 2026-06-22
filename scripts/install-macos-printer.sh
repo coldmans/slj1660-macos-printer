@@ -27,16 +27,45 @@ canonical_dir() {
 
 source_root="$(cd "$(dirname "$0")/.." && pwd -P)"
 install_root="$(canonical_dir "$INSTALL_ROOT")"
+install_marker="$install_root/.slj1660-install-root"
 
 if [ "$(uname -s)" != "Darwin" ]; then
   die "이 설치기는 macOS 전용입니다."
 fi
 
+ensure_safe_install_root() {
+  local home_root
+  home_root="$(cd "$HOME" && pwd -P)"
+
+  case "$install_root" in
+    "/"|"/Users"|"$home_root"|"$home_root/Desktop"|"$home_root/Documents"|"$home_root/Downloads"|"$home_root/Library"|"$home_root/Library/Application Support")
+      die "설치 폴더가 너무 넓습니다: $install_root"
+      ;;
+  esac
+
+  if [ "$source_root" != "$install_root" ] &&
+     [ ! -f "$install_marker" ] &&
+     find "$install_root" -mindepth 1 -maxdepth 1 | grep -q .; then
+    cat >&2 <<EOF
+
+설치 폴더가 비어있지 않고 SL-J1660 설치 marker도 없습니다:
+  $install_root
+
+기존 사용자 파일을 지우지 않기 위해 중단합니다.
+다른 SLJ1660_INSTALL_ROOT를 지정하거나 폴더를 직접 정리한 뒤 다시 실행하세요.
+
+EOF
+    exit 1
+  fi
+}
+
 copy_to_install_root() {
   if [ "$source_root" = "$install_root" ]; then
+    touch "$install_marker"
     return 0
   fi
 
+  ensure_safe_install_root
   say "설치 파일을 사용자 Application Support 폴더로 복사합니다"
   rsync -a --delete \
     --exclude '.git/' \
@@ -47,7 +76,9 @@ copy_to_install_root() {
     --exclude 'fixtures/captured/' \
     --exclude 'venv/' \
     --exclude '.venv/' \
+    --exclude '.slj1660-install-root' \
     "$source_root/" "$install_root/"
+  touch "$install_marker"
 
   chmod +x "$install_root/Install SL-J1660.command" 2>/dev/null || true
   chmod +x "$install_root/Uninstall SL-J1660.command" 2>/dev/null || true

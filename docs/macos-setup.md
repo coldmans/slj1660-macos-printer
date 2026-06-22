@@ -213,10 +213,17 @@ The older conservative setting was `4096 / 120000 / 10`. It is still useful as
 a fallback for unusually large or fragile jobs, but the timetable q12 RAW
 validated `16384 / 30000 / 0` without mid-page bulk write timeouts.
 
-During normal local IPP printing, the daemon has an automatic resume watchdog:
-if a raw page transfer stays active long enough to look like the printer is
-waiting for its blinking resume button, it sends the Windows-captured LEDM
-resume request itself.
+The automatic resume watchdog is disabled by default. If a particular printer
+regularly waits for its blinking resume button during long page transfers, you
+can opt in:
+
+```sh
+SLJ1660_AUTO_RESUME=1 scripts/install-local-ipp-printer.sh
+```
+
+When enabled, the daemon sends the Windows-captured LEDM resume request if a raw
+page transfer stays active long enough to look like a feed-attention wait. Keep
+it off when diagnosing paper, cover, or cartridge problems.
 
 If a job fails or is interrupted outside the active IPP flow and the printer is
 left in a feed-attention state, the Windows round-2 captures showed that the

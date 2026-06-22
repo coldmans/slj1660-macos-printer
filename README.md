@@ -14,7 +14,7 @@ print-only 프린터 앱**입니다. 커널 확장, 오래된 Apple HP Printer D
 - macOS 로컬 IPP printer-app daemon 제공
 - `SL_J1660_Local` CUPS 큐를 통해 일반 PDF 출력
 - low-ink, single-cartridge, feed-attention 상태에 대한 LEDM 확인/재개 요청
-- 출력 중 멈춤처럼 보이는 상태에서 자동 LEDM resume watchdog
+- 필요할 때 켤 수 있는 LEDM resume watchdog
 
 아직 scanner, ink/status UI, 컬러 관리, 완전한 제조사급 드라이버 기능은 없습니다.
 목표는 “맥에서 SL-J1660으로 흑백 문서를 편하게 뽑는 실사용 경로”입니다.
@@ -89,13 +89,15 @@ macOS 앱 / Preview / lp
   -> libusb bulk OUT endpoint 0x08
 ```
 
-LEDM/status 요청은 interface `3`, endpoint `0x0a`를 사용합니다. 출력 중 RAW
-전송이 오래 지속되면 daemon이 Windows 캡처에서 확인한 resume 요청을 자동으로
-보냅니다. 수동 복구가 필요하면 다음을 실행할 수 있습니다.
+LEDM/status 요청은 interface `3`, endpoint `0x0a`를 사용합니다. 수동 복구가
+필요하면 다음을 실행할 수 있습니다.
 
 ```sh
 scripts/resume-feed-attention.sh
 ```
+
+출력 중 급지 resume 요청을 자동으로 보내는 watchdog은 안전을 위해 기본 OFF입니다.
+필요할 때만 `SLJ1660_AUTO_RESUME=1 scripts/install-local-ipp-printer.sh`로 켜세요.
 
 ## 실험용 명령
 
@@ -141,7 +143,7 @@ scripts/print-pdf-mode10.py sample.pdf \
 이 프로젝트에는 두 종류의 코드가 섞여 있습니다.
 
 - Rust CLI/IPP/USB glue: MIT
-- Python Mode10 compressor 일부: HP HPLIP `Mode10.cpp`에서 포팅한 BSD-style 코드
+- Mode10 compressor/decoder 일부: HP HPLIP `Mode10.cpp`에서 파생된 BSD-style 코드
 
 자세한 내용은 [LICENSE](LICENSE)와
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)를 보세요.

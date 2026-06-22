@@ -115,6 +115,10 @@ pub enum Commands {
         #[arg(long, default_value = "127.0.0.1:8631")]
         bind: SocketAddr,
 
+        /// Allow binding the unauthenticated local IPP server to a non-loopback address.
+        #[arg(long)]
+        allow_remote: bool,
+
         /// HTTP path exposed as the printer URI.
         #[arg(long, default_value = "/printers/slj1660")]
         printer_path: String,
@@ -142,6 +146,10 @@ pub enum Commands {
         /// Skip best-effort LEDM alert/resume acknowledgement requests.
         #[arg(long)]
         no_confirm_alerts: bool,
+
+        /// Send captured LEDM feed-attention resume requests during long transfers.
+        #[arg(long)]
+        auto_resume: bool,
 
         /// Bulk transfer chunk size in bytes for generated raw pages.
         #[arg(long, default_value_t = DEFAULT_CHUNK_SIZE)]
@@ -198,6 +206,7 @@ pub fn run(cli: Cli) -> Result<()> {
         } => run_print_pdf(path, dry_run, output_raw),
         Commands::ServeIpp {
             bind,
+            allow_remote,
             printer_path,
             project_root,
             script,
@@ -205,12 +214,14 @@ pub fn run(cli: Cli) -> Result<()> {
             serial,
             dry_run,
             no_confirm_alerts,
+            auto_resume,
             chunk_size,
             timeout_ms,
             chunk_delay_ms,
             max_pages,
         } => run_serve_ipp(
             bind,
+            allow_remote,
             printer_path,
             project_root,
             script,
@@ -218,6 +229,7 @@ pub fn run(cli: Cli) -> Result<()> {
             serial,
             dry_run,
             no_confirm_alerts,
+            auto_resume,
             chunk_size,
             timeout_ms,
             chunk_delay_ms,
@@ -391,6 +403,7 @@ fn run_print_pdf(path: PathBuf, dry_run: bool, output_raw: Option<PathBuf>) -> R
 #[allow(clippy::too_many_arguments)]
 fn run_serve_ipp(
     bind: SocketAddr,
+    allow_remote: bool,
     printer_path: String,
     project_root: Option<PathBuf>,
     script: Option<PathBuf>,
@@ -398,11 +411,19 @@ fn run_serve_ipp(
     serial: Option<String>,
     dry_run: bool,
     no_confirm_alerts: bool,
+    auto_resume: bool,
     chunk_size: usize,
     timeout_ms: u64,
     chunk_delay_ms: u64,
     max_pages: u32,
 ) -> Result<()> {
+    if !bind.ip().is_loopback() && !allow_remote {
+        bail!(
+            "refusing to bind unauthenticated IPP server to non-loopback address {bind}; \
+             use --allow-remote only on a trusted network"
+        );
+    }
+
     let project_root = project_root.unwrap_or_else(default_project_root);
     let script_path = script.unwrap_or_else(|| default_script_path(&project_root));
     let printer_path = if printer_path.is_empty() {
@@ -420,6 +441,7 @@ fn run_serve_ipp(
         serial_number: serial,
         dry_run,
         confirm_alerts: !no_confirm_alerts,
+        auto_resume,
         chunk_size,
         chunk_delay: Duration::from_millis(chunk_delay_ms),
         timeout: Duration::from_millis(timeout_ms),
